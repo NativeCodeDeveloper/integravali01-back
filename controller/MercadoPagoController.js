@@ -4,6 +4,7 @@ import PedidoCompras from "../model/PedidoCompras.js";
 import ReservaPacientes from "../model/ReservaPacientes.js";
 import Pacientes from "../model/Pacientes.js";
 import NotificacionAgendamiento from "../services/notificacionAgendamiento.js";
+import { notificacionAgendamiento } from "../services/notificacionWhatsApp.js";
 
 dotenv.config();
 
@@ -274,6 +275,18 @@ export const recibirPago = async (req, res) => {
                             console.log('Correo de agendamiento enviado al paciente:', reserva.email);
                         } catch (errMailPaciente) {
                             console.error('Error enviando correo de agendamiento al paciente:', errMailPaciente);
+                        }
+
+                        try {
+                            await notificacionAgendamiento({
+                                telefono: reserva.telefono,
+                                nombre: reserva.nombrePaciente,
+                                fecha: reserva.fechaInicio,
+                                hora: reserva.horaInicio
+                            });
+                            console.log('WhatsApp de agendamiento enviado al paciente:', reserva.telefono);
+                        } catch (errWspPaciente) {
+                            console.error('Error enviando WhatsApp de agendamiento al paciente:', errWspPaciente);
                         }
 
                         // --- NOTIFICAR AL EQUIPO ---
